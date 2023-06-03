@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Boat-Degree-App/static/css/main.e61cfb2e.css",
+    "main.js": "/Boat-Degree-App/static/js/main.6e82da62.js",
+    "static/js/787.d3a1b06d.chunk.js": "/Boat-Degree-App/static/js/787.d3a1b06d.chunk.js",
+    "index.html": "/Boat-Degree-App/index.html",
+    "main.e61cfb2e.css.map": "/Boat-Degree-App/static/css/main.e61cfb2e.css.map",
+    "main.6e82da62.js.map": "/Boat-Degree-App/static/js/main.6e82da62.js.map",
+    "787.d3a1b06d.chunk.js.map": "/Boat-Degree-App/static/js/787.d3a1b06d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e61cfb2e.css",
+    "static/js/main.6e82da62.js"
+  ]
+}
