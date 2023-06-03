@@ -182,7 +182,7 @@ function App() {
   return (
     <div id="app-container">
       <div id="map-container">
-      <MapContainer center={[57.8, 11.3]} zoom={10} ref={mapRef}>
+      <MapContainer center={[57.8, 11.3]} zoom={6} ref={mapRef}>
           <MapClickHandler />
           <TileLayer
             attribution=""
