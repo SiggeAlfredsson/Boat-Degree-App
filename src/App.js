@@ -64,6 +64,11 @@ function App() {
   const [markerB, setMarkerB] = useState(null);
   const [speed, setSpeed] = useState(5);
   const [estimatedTime, setEstimatedTime] = useState(null);
+  const [showInputs, setShowInputs] = useState(false);
+  const [inputLatA, setInputLatA] = useState("");
+  const [inputLngA, setInputLngA] = useState("");
+  const [inputLatB, setInputLatB] = useState("");
+  const [inputLngB, setInputLngB] = useState("");
 
   function handleMapClick(event) {
     const { lat, lng } = event.latlng;
@@ -85,6 +90,46 @@ function App() {
 
   function handleSpeedChange(event) {
     setSpeed(event.target.value);
+  }
+
+  function handleToggleSwitch() {
+    setShowInputs(!showInputs);
+  }
+
+  function handleInputChange(event, field) {
+    const value = event.target.value;
+    switch (field) {
+      case "latA":
+        setInputLatA(value);
+        break;
+      case "lngA":
+        setInputLngA(value);
+        break;
+      case "latB":
+        setInputLatB(value);
+        break;
+      case "lngB":
+        setInputLngB(value);
+        break;
+      default:
+        break;
+    }
+  }
+
+  function handleCoordinatesSubmit(event) {
+    event.preventDefault();
+    const latA = parseFloat(inputLatA);
+    const lngA = parseFloat(inputLngA);
+    const latB = parseFloat(inputLatB);
+    const lngB = parseFloat(inputLngB);
+
+    if (!isNaN(latA) && !isNaN(lngA) && !isNaN(latB) && !isNaN(lngB)) {
+      setMarkerA({ lat: latA, lng: lngA });
+      setMarkerB({ lat: latB, lng: lngB });
+      setShowInputs(false);
+    } else {
+      console.log("Invalid coordinates");
+    }
   }
 
   function MapClickHandler() {
@@ -163,6 +208,62 @@ function App() {
               </h2>
             )}
           </>
+        )}
+
+        <div id="lolol">
+        <div className="toggle-switch">
+          <input
+            type="checkbox"
+            id="switch"
+            checked={showInputs}
+            onChange={() => setShowInputs(!showInputs)}
+          />
+          <label htmlFor="switch">Toggle</label>
+        </div>
+        <h2>Enter Coordinates Manually</h2>
+        </div>
+
+        {showInputs && (
+          <form className="coordinates-form" onSubmit={handleCoordinatesSubmit}>
+            <h2>Enter Coordinates:</h2>
+            <div>
+              <label htmlFor="latA">Latitude A: </label>
+              <input
+                type="text"
+                id="latA"
+                value={inputLatA}
+                onChange={(e) => handleInputChange(e, "latA")}
+              />
+            </div>
+            <div>
+              <label htmlFor="lngA">Longitude A: </label>
+              <input
+                type="text"
+                id="lngA"
+                value={inputLngA}
+                onChange={(e) => handleInputChange(e, "lngA")}
+              />
+            </div>
+            <div>
+              <label htmlFor="latB">Latitude B: </label>
+              <input
+                type="text"
+                id="latB"
+                value={inputLatB}
+                onChange={(e) => handleInputChange(e, "latB")}
+              />
+            </div>
+            <div>
+              <label htmlFor="lngB">Longitude B: </label>
+              <input
+                type="text"
+                id="lngB"
+                value={inputLngB}
+                onChange={(e) => handleInputChange(e, "lngB")}
+              />
+            </div>
+            <button type="submit">Submit</button>
+          </form>
         )}
       </div>
     </div>

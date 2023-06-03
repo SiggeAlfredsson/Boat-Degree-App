@@ -66,3 +66,186 @@ input[type="number"]:focus {
   background-size: cover;
   border: none;
 }
+
+/* CSS for the toggle switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.toggle-switch input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: #2196f3;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+/* CSS for the coordinates form */
+.coordinates-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.coordinates-form label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.coordinates-form input {
+  margin-bottom: 10px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.coordinates-form button {
+  padding: 10px 20px;
+  background-color: #090088;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.coordinates-form button:hover {
+  background-color: #070063;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  /* z-index: 1; */
+}
+
+
+.toggle-switch input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-switch label {
+  cursor: pointer;
+  text-indent: -9999px;
+  width: 100%;
+  height: 100%;
+  background: grey;
+  display: block;
+  border-radius: 34px;
+  position: relative;
+}
+
+.toggle-switch label:after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.toggle-switch input:checked + label {
+  background: #090088;
+}
+
+.toggle-switch input:checked + label:after {
+  left: calc(100% - 5px);
+  transform: translateX(-100%);
+}
+
+.toggle-switch label:active:after {
+  width: 34px;
+}
+
+.coordinates-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* border: red solid 1px; */
+/* background-color: #090088; */
+/* border-radius: 20px; */
+}
+
+.coordinates-form div {
+  margin-bottom: 10px;
+  /* border: red solid 1px; */
+}
+
+.coordinates-form label {
+  display: inline-block;
+  width: 100px;
+  text-align: right;
+  margin-right: 10px;
+}
+
+.coordinates-form input[type="text"] {
+  width: 150px;
+}
+
+.coordinates-form button {
+  margin-top: 10px;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.toggle-container label {
+  margin-left: 10px;
+}
+
+
+#lolol {
+  display: flex;
+  /* align-items: center; */
+}
+
+#lolol .toggle-switch {
+  margin-right: 10px;
+}
+
+#lolol h2 {
+  margin-top: 25px;
+  /* padding-top: 40px; */
+}
