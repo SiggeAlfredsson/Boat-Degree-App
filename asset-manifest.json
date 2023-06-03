@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/Boat-Degree-App/static/css/main.1f0cd778.css",
-    "main.js": "/Boat-Degree-App/static/js/main.89322f4b.js",
+    "main.css": "/Boat-Degree-App/static/css/main.36e30dd8.css",
+    "main.js": "/Boat-Degree-App/static/js/main.f605705e.js",
     "static/js/787.d3a1b06d.chunk.js": "/Boat-Degree-App/static/js/787.d3a1b06d.chunk.js",
     "index.html": "/Boat-Degree-App/index.html",
-    "main.1f0cd778.css.map": "/Boat-Degree-App/static/css/main.1f0cd778.css.map",
-    "main.89322f4b.js.map": "/Boat-Degree-App/static/js/main.89322f4b.js.map",
+    "main.36e30dd8.css.map": "/Boat-Degree-App/static/css/main.36e30dd8.css.map",
+    "main.f605705e.js.map": "/Boat-Degree-App/static/js/main.f605705e.js.map",
     "787.d3a1b06d.chunk.js.map": "/Boat-Degree-App/static/js/787.d3a1b06d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1f0cd778.css",
-    "static/js/main.89322f4b.js"
+    "static/css/main.36e30dd8.css",
+    "static/js/main.f605705e.js"
   ]
 }
