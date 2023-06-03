@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
 import {
@@ -69,22 +69,39 @@ function App() {
   const [inputLngA, setInputLngA] = useState("");
   const [inputLatB, setInputLatB] = useState("");
   const [inputLngB, setInputLngB] = useState("");
+  const mapRef = useRef();
+
+
+  function handleCurrentLocationClick() {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+      setMarkerA({ lat: latitude, lng: longitude });
+      setMarkerB(null);
+      mapRef.current.flyTo([latitude, longitude], 10);
+    });
+  }
 
   function handleMapClick(event) {
     const { lat, lng } = event.latlng;
-
+  
     if (!markerA) {
       setMarkerA({ lat, lng });
       console.log("Marker A set at Latitude: " + lat + ", Longitude: " + lng);
     } else if (!markerB) {
       setMarkerB({ lat, lng });
       console.log("Marker B set at Latitude: " + lat + ", Longitude: " + lng);
+  
+      // Calculate the bounds of the markers
+      const bounds = L.latLngBounds([markerA, { lat, lng }]);
+  
+      // Fly to fit the bounds with 10% padding
+      mapRef.current.fitBounds(bounds, { padding: [90, 90] });
     } else {
       setMarkerA({ lat, lng });
       setMarkerB(null);
       console.log("Marker A reset at Latitude: " + lat + ", Longitude: " + lng);
     }
-
+  
     // Do something with the coordinates...
   }
 
@@ -165,7 +182,7 @@ function App() {
   return (
     <div id="app-container">
       <div id="map-container">
-        <MapContainer center={[57.8, 11.3]} zoom={10}>
+      <MapContainer center={[57.8, 11.3]} zoom={10} ref={mapRef}>
           <MapClickHandler />
           <TileLayer
             attribution=""
@@ -187,6 +204,8 @@ function App() {
         </MapContainer>
       </div>
       <div id="info-container">
+      <button onClick={handleCurrentLocationClick}>Mark Current Location</button>
+
         {distances && (
           <>
             <h2>Distance: {distances.km} km</h2>
@@ -222,6 +241,7 @@ function App() {
         </div>
         <h2>Enter Coordinates Manually</h2>
         </div>
+
 
         {showInputs && (
           <form className="coordinates-form" onSubmit={handleCoordinatesSubmit}>

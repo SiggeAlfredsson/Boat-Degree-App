@@ -145,6 +145,20 @@ input[type="number"]:focus {
   background-color: #070063;
 }
 
+#info-container button {
+  padding: 10px 20px;
+  background-color: #090088;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#info-container button:hover {
+  background-color: #070063;
+ 
+}
+
 .toggle-switch {
   position: relative;
   display: inline-block;
