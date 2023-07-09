@@ -1,7 +1,6 @@
 # Navigation Path Finder
 ## Demo https://siggealfredsson.github.io/Boat-Degree-App/
 
-Known bugs: No speed over 9 knots works ? 
 
 Almost everything made by GPT 3.5.
 
