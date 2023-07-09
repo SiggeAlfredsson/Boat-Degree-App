@@ -144,6 +144,7 @@ function App() {
       setMarkerA({ lat: latA, lng: lngA });
       setMarkerB({ lat: latB, lng: lngB });
       setShowInputs(false);
+      speed = 0;
     } else {
       console.log("Invalid coordinates");
     }
@@ -170,14 +171,16 @@ function App() {
   const distances =
     markerA && markerB ? calculateDistance(markerA, markerB) : null;
 
-  React.useEffect(() => {
-    if (distances && speed > 0 && !estimatedTime) {
-      const estimatedTime = calculateEstimatedTime(distances.nm, speed);
-      setEstimatedTime(estimatedTime);
-    } else if ((!distances || speed <= 0) && estimatedTime) {
-      setEstimatedTime(null);
-    }
-  }, [distances, speed, estimatedTime]);
+    React.useEffect(() => {
+      if (speed > 0 && distances && distances.nm) {
+        const newEstimatedTime = calculateEstimatedTime(distances.nm, speed);
+        if (newEstimatedTime.hours !== estimatedTime?.hours || newEstimatedTime.minutes !== estimatedTime?.minutes) {
+          setEstimatedTime(newEstimatedTime);
+        }
+      } else {
+        setEstimatedTime(null);
+      }
+    }, [speed, distances]);
 
   return (
     <div id="app-container">
@@ -217,6 +220,7 @@ function App() {
                 type="number"
                 id="speed"
                 value={speed}
+                min="0"
                 onChange={handleSpeedChange}
               />
             </div>
