@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
 import {
@@ -10,19 +10,29 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
+// ✅ CORRECT DEFAULT ICON SETUP for React + Leaflet + Webpack
 
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+
+const DefaultIcon = L.icon({
+  iconRetinaUrl: iconRetinaUrl,
+  iconUrl: iconUrl,
+  shadowUrl: shadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
 });
 
-function calculateDistance(latlngA, latlngB) {
-  const R = 6371; // Radius of the earth in kilometers
+L.Marker.prototype.options.icon = DefaultIcon;
 
+
+
+// Helper to calculate distance & bearing between two points
+function calculateDistance(latlngA, latlngB) {
+  const R = 6371; // km
   const dLat = (latlngB.lat - latlngA.lat) * (Math.PI / 180);
   const dLon = (latlngB.lng - latlngA.lng) * (Math.PI / 180);
   const latA = latlngA.lat * (Math.PI / 180);
@@ -48,22 +58,20 @@ function calculateDistance(latlngA, latlngB) {
   };
 }
 
+// Helper to calculate estimated time
 function calculateEstimatedTime(distance, speed) {
   const timeInHours = distance / speed;
-  const hours = Math.floor(timeInHours);
-  const minutes = Math.round((timeInHours - hours) * 60);
-
   return {
-    hours: hours,
-    minutes: minutes,
+    hours: Math.floor(timeInHours),
+    minutes: Math.round((timeInHours - Math.floor(timeInHours)) * 60),
   };
 }
 
 function App() {
-  const [markerA, setMarkerA] = useState(null);
-  const [markerB, setMarkerB] = useState(null);
+  const [markers, setMarkers] = useState([]);
   const [speed, setSpeed] = useState(5);
   const [estimatedTime, setEstimatedTime] = useState(null);
+  const [totalDistance, setTotalDistance] = useState(null);
   const [showInputs, setShowInputs] = useState(false);
   const [inputLatA, setInputLatA] = useState("");
   const [inputLngA, setInputLngA] = useState("");
@@ -71,38 +79,26 @@ function App() {
   const [inputLngB, setInputLngB] = useState("");
   const mapRef = useRef();
 
-
   function handleCurrentLocationClick() {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
-      setMarkerA({ lat: latitude, lng: longitude });
-      setMarkerB(null);
+      setMarkers([{ lat: latitude, lng: longitude }]);
       mapRef.current.flyTo([latitude, longitude], 10);
     });
   }
 
   function handleMapClick(event) {
     const { lat, lng } = event.latlng;
-  
-    if (!markerA) {
-      setMarkerA({ lat, lng });
-      console.log("Marker A set at Latitude: " + lat + ", Longitude: " + lng);
-    } else if (!markerB) {
-      setMarkerB({ lat, lng });
-      console.log("Marker B set at Latitude: " + lat + ", Longitude: " + lng);
-  
-      // Calculate the bounds of the markers
-      const bounds = L.latLngBounds([markerA, { lat, lng }]);
-  
-      // Fly to fit the bounds with 10% padding
+    setMarkers((prev) => [...prev, { lat, lng }]);
+
+    if (markers.length > 0) {
+      const bounds = L.latLngBounds(markers.map((m) => [m.lat, m.lng]).concat([[lat, lng]]));
       mapRef.current.fitBounds(bounds, { padding: [90, 90] });
-    } else {
-      setMarkerA({ lat, lng });
-      setMarkerB(null);
-      console.log("Marker A reset at Latitude: " + lat + ", Longitude: " + lng);
     }
-  
-    // Do something with the coordinates...
+  }
+
+  function handleClearMarkers() {
+    setMarkers([]);
   }
 
   function handleSpeedChange(event) {
@@ -116,20 +112,11 @@ function App() {
   function handleInputChange(event, field) {
     const value = event.target.value;
     switch (field) {
-      case "latA":
-        setInputLatA(value);
-        break;
-      case "lngA":
-        setInputLngA(value);
-        break;
-      case "latB":
-        setInputLatB(value);
-        break;
-      case "lngB":
-        setInputLngB(value);
-        break;
-      default:
-        break;
+      case "latA": setInputLatA(value); break;
+      case "lngA": setInputLngA(value); break;
+      case "latB": setInputLatB(value); break;
+      case "lngB": setInputLngB(value); break;
+      default: break;
     }
   }
 
@@ -141,79 +128,85 @@ function App() {
     const lngB = parseFloat(inputLngB);
 
     if (!isNaN(latA) && !isNaN(lngA) && !isNaN(latB) && !isNaN(lngB)) {
-      setMarkerA({ lat: latA, lng: lngA });
-      setMarkerB({ lat: latB, lng: lngB });
+      setMarkers((prev) => [...prev, { lat: latA, lng: lngA }, { lat: latB, lng: lngB }]);
       setShowInputs(false);
-      speed = 0;
     } else {
       console.log("Invalid coordinates");
     }
   }
 
   function MapClickHandler() {
-    useMapEvents({
-      click: handleMapClick,
-    });
+    useMapEvents({ click: handleMapClick });
     return null;
   }
 
+  // Red icon for additional markers
   const redIcon = L.icon({
-    iconUrl:
-      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
-    shadowUrl:
-      "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
     shadowSize: [41, 41],
   });
 
-  const distances =
-    markerA && markerB ? calculateDistance(markerA, markerB) : null;
-
-    React.useEffect(() => {
-      if (speed > 0 && distances && distances.nm) {
-        const newEstimatedTime = calculateEstimatedTime(distances.nm, speed);
-        if (newEstimatedTime.hours !== estimatedTime?.hours || newEstimatedTime.minutes !== estimatedTime?.minutes) {
-          setEstimatedTime(newEstimatedTime);
-        }
+  // Calculate total distance & estimated time
+  useEffect(() => {
+    let total = 0;
+    for (let i = 1; i < markers.length; i++) {
+      total += parseFloat(calculateDistance(markers[i - 1], markers[i]).nm);
+    }
+    if (total > 0) {
+      setTotalDistance(total.toFixed(2));
+      if (speed > 0) {
+        setEstimatedTime(calculateEstimatedTime(total, speed));
       } else {
         setEstimatedTime(null);
       }
-    }, [speed, distances]);
+    } else {
+      setTotalDistance(null);
+      setEstimatedTime(null);
+    }
+  }, [markers, speed]);
 
   return (
     <div id="app-container">
       <div id="map-container">
-      <MapContainer center={[57.8, 11.3]} zoom={6} ref={mapRef}>
+        <MapContainer center={[57.8, 11.3]} zoom={6} ref={mapRef}>
           <MapClickHandler />
           <TileLayer
             attribution=""
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {markerA && <Marker position={[markerA.lat, markerA.lng]} />}
-          {markerB && (
-            <Marker position={[markerB.lat, markerB.lng]} icon={redIcon} />
-          )}
-          {markerA && markerB && (
+          {markers.map((m, i) => (
+          <Marker
+            key={i}
+            position={[m.lat, m.lng]}
+            icon={i === 0 ? DefaultIcon : redIcon}
+            eventHandlers={{
+              click: () => {
+                // Remove marker at index i
+                setMarkers((prev) => prev.filter((_, index) => index !== i));
+              },
+            }}ö
+          />
+          ))}
+          {markers.length > 1 && (
             <Polyline
-              positions={[
-                [markerA.lat, markerA.lng],
-                [markerB.lat, markerB.lng],
-              ]}
+              positions={markers.map((m) => [m.lat, m.lng])}
               color="red"
             />
           )}
         </MapContainer>
       </div>
-      <div id="info-container">
-      <button onClick={handleCurrentLocationClick}>Mark Current Location</button>
 
-        {distances && (
+      <div id="info-container">
+        <button onClick={handleCurrentLocationClick}>Mark Current Location</button>
+        <button onClick={handleClearMarkers} style={{ marginLeft: "10px" }}>Clear Markers</button>
+
+        {totalDistance && (
           <>
-            <h2>Distance: {distances.km} km</h2>
-            <h2>Distance: {distances.nm} nautical miles</h2>
-            <h2>Bearing: {distances.bearing} degrees</h2>
+            <h2>Total Distance: {totalDistance} nautical miles</h2>
             <div>
               <label htmlFor="speed">Average Boat Speed (knots): </label>
               <input
@@ -226,26 +219,24 @@ function App() {
             </div>
             {estimatedTime && (
               <h2>
-                Estimated Time: {estimatedTime.hours} hours,{" "}
-                {estimatedTime.minutes} minutes
+                Estimated Time: {estimatedTime.hours} hours, {estimatedTime.minutes} minutes
               </h2>
             )}
           </>
         )}
 
         <div id="lolol">
-        <div className="toggle-switch">
-          <input
-            type="checkbox"
-            id="switch"
-            checked={showInputs}
-            onChange={() => setShowInputs(!showInputs)}
-          />
-          <label htmlFor="switch">Toggle</label>
+          <div className="toggle-switch">
+            <input
+              type="checkbox"
+              id="switch"
+              checked={showInputs}
+              onChange={handleToggleSwitch}
+            />
+            <label htmlFor="switch">Toggle</label>
+          </div>
+          <h2>Enter Coordinates Manually</h2>
         </div>
-        <h2>Enter Coordinates Manually</h2>
-        </div>
-
 
         {showInputs && (
           <form className="coordinates-form" onSubmit={handleCoordinatesSubmit}>
