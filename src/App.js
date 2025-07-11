@@ -77,6 +77,7 @@ function App() {
   const [inputLngA, setInputLngA] = useState("");
   const [inputLatB, setInputLatB] = useState("");
   const [inputLngB, setInputLngB] = useState("");
+  const [heading, setHeading] = useState(null);
   const mapRef = useRef();
 
   function handleCurrentLocationClick() {
@@ -167,6 +168,13 @@ function App() {
       setTotalDistance(null);
       setEstimatedTime(null);
     }
+
+    if (markers.length === 2) {
+      const { bearing } = calculateDistance(markers[0], markers[1]);
+      setHeading(bearing);
+    } else {
+      setHeading(null);
+    }
   }, [markers, speed]);
 
   return (
@@ -201,12 +209,45 @@ function App() {
       </div>
 
       <div id="info-container">
-        <button onClick={handleCurrentLocationClick}>Mark Current Location</button>
-        <button onClick={handleClearMarkers} style={{ marginLeft: "10px" }}>Clear Markers</button>
-
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px', // optional, spacing between items
+          marginBottom: '10px' // spacing below this row
+        }}>
+          <button onClick={handleCurrentLocationClick}>Mark Current Location</button>
+          <button onClick={handleClearMarkers}>Clear Markers</button>
+          {markers.length == 2 && (
+            <div style={{ 
+              width: '30px',
+              height: '30px',
+              border: '2px solid #333',
+              borderRadius: '50%',
+              backgroundColor: 'black',
+              position: 'relative',
+              flexShrink: 0
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: '2px',
+                height: '50%',
+                borderRadius: '10px',
+                background: 'red',
+                transform: `translate(-50%, -100%) rotate(${heading}deg)`,
+                transformOrigin: 'bottom center'
+              }} />
+            </div>
+          )}
+        </div>
         {totalDistance && (
           <>
             <h2>Total Distance: {totalDistance} nautical miles</h2>
+              {heading && (
+                <h2>Heading: {heading}°</h2>
+              )}
+
             <div>
               <label htmlFor="speed">Average Boat Speed (knots): </label>
               <input
